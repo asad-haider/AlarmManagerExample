@@ -31,13 +31,15 @@ public class ResetAlarms extends BroadcastReceiver {
             if (cursor.moveToFirst()){
                 do {
                     int cursorId = cursor.getInt(0);
-                    int alarm_time = cursor.getInt(1);
+                    long alarm_time = cursor.getLong(1);
+                    String alarm_name = cursor.getString(2);
 
                     Calendar calendar = Calendar.getInstance();
                     calendar.setTimeInMillis(alarm_time);
 
                     System.out.println("Alarm ID: " + cursorId);
                     System.out.println("Alarm Time: " + calendar.getTime().toString());
+                    System.out.println("Alarm Name: " + alarm_name);
 
                     alarmIntent = PendingIntent.getBroadcast(context, cursorId, receiverIntent, 0);
                     alarmMgr.set(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), alarmIntent);
@@ -49,5 +51,15 @@ public class ResetAlarms extends BroadcastReceiver {
 
             Toast.makeText(context, "Resetting Alarms!", Toast.LENGTH_SHORT).show();
         }
+
+        intent = new Intent(context, AlarmScheduler.class);
+        alarmIntent = PendingIntent.getBroadcast(context, 0, intent, 0);
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTimeInMillis(System.currentTimeMillis());
+        calendar.set(Calendar.HOUR_OF_DAY, 24);
+        calendar.set(Calendar.MINUTE, 0);
+        calendar.set(Calendar.SECOND, 0);
+        alarmMgr.setInexactRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), AlarmManager.INTERVAL_DAY, alarmIntent);
+
     }
 }
